@@ -1,0 +1,184 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Updated to ocean-themed color palette with glassmorphism support */
+  --background: #f0fdf4; /* Light seafoam for a calming backdrop */
+  --foreground: #374151; /* Dark slate for text */
+  --card: rgba(255, 255, 255, 0.8); /* Translucent white for glassmorphism cards */
+  --card-foreground: #374151; /* Dark slate for card text */
+  --popover: rgba(255, 255, 255, 0.9); /* Slightly opaque popover background */
+  --popover-foreground: #374151; /* Dark slate for popover text */
+  --primary: #15803d; /* Green-700 for primary actions */
+  --primary-foreground: #ffffff; /* White text on primary buttons */
+  --secondary: #84cc16; /* Lime green for secondary actions */
+  --secondary-foreground: #374151; /* Dark slate for secondary button text */
+  --muted: #f0fdf4; /* Light seafoam for muted elements */
+  --muted-foreground: #374151; /* Dark slate for muted text */
+  --accent: #84cc16; /* Lime green for accent elements */
+  --accent-foreground: #374151; /* Dark slate for accent text */
+  --destructive: #be123c; /* Rose-600 for error messages */
+  --destructive-foreground: #ffffff; /* White text on error messages */
+  --border: #d1d5db; /* Light gray for borders */
+  --input: #ffffff; /* White for input fields */
+  --ring: rgba(21, 128, 61, 0.5); /* Ocean green for focus ring */
+  --chart-1: #15803d; /* First color for data visualization */
+  --chart-2: #84cc16; /* Second color for data visualization */
+  --chart-3: #0ea5e9; /* Third color for data visualization */
+  --chart-4: #8b5cf6; /* Fourth color for data visualization */
+  --chart-5: #f59e0b; /* Fifth color for data visualization */
+  --radius: 0.5rem; /* Rounded corners for cards and buttons */
+  --sidebar: rgba(255, 255, 255, 0.8); /* Translucent sidebar */
+  --sidebar-foreground: #374151; /* Dark slate for sidebar text */
+  --sidebar-primary: #15803d; /* Green-700 for sidebar highlights */
+  --sidebar-primary-foreground: #ffffff; /* White text for sidebar highlights */
+  --sidebar-accent: #84cc16; /* Lime green for sidebar accents */
+  --sidebar-accent-foreground: #374151; /* Dark slate for sidebar accent text */
+  --sidebar-border: #d1d5db; /* Light gray for sidebar borders */
+  --sidebar-ring: rgba(21, 128, 61, 0.5); /* Ocean green for sidebar focus ring */
+}
+
+.dark {
+  /* Updated dark mode colors to maintain ocean theme */
+  --background: #0f172a; /* Deep ocean blue for dark background */
+  --foreground: #f1f5f9; /* Light blue-gray for text */
+  --card: rgba(15, 23, 42, 0.8); /* Translucent dark blue for glassmorphism cards */
+  --card-foreground: #f1f5f9; /* Light blue-gray for card text */
+  --popover: rgba(15, 23, 42, 0.9); /* Slightly opaque dark popover background */
+  --popover-foreground: #f1f5f9; /* Light blue-gray for popover text */
+  --primary: #22d3ee; /* Cyan-400 for primary actions in dark mode */
+  --primary-foreground: #0f172a; /* Dark blue text on primary buttons */
+  --secondary: #84cc16; /* Lime green for secondary actions */
+  --secondary-foreground: #f1f5f9; /* Light text for secondary button text */
+  --muted: #1e293b; /* Dark slate for muted elements */
+  --muted-foreground: #94a3b8; /* Slate-400 for muted text */
+  --accent: #22d3ee; /* Cyan-400 for accent elements */
+  --accent-foreground: #0f172a; /* Dark blue for accent text */
+  --destructive: #f87171; /* Red-400 for error messages */
+  --destructive-foreground: #0f172a; /* Dark text on error messages */
+  --border: #334155; /* Slate-700 for borders */
+  --input: #1e293b; /* Dark slate for input fields */
+  --ring: rgba(34, 211, 238, 0.5); /* Cyan for focus ring */
+  --chart-1: #22d3ee; /* First color for data visualization */
+  --chart-2: #84cc16; /* Second color for data visualization */
+  --chart-3: #06b6d4; /* Third color for data visualization */
+  --chart-4: #a855f7; /* Fourth color for data visualization */
+  --chart-5: #f59e0b; /* Fifth color for data visualization */
+  --sidebar: rgba(15, 23, 42, 0.8); /* Translucent dark sidebar */
+  --sidebar-foreground: #f1f5f9; /* Light text for sidebar */
+  --sidebar-primary: #22d3ee; /* Cyan-400 for sidebar highlights */
+  --sidebar-primary-foreground: #0f172a; /* Dark text for sidebar highlights */
+  --sidebar-accent: #84cc16; /* Lime green for sidebar accents */
+  --sidebar-accent-foreground: #f1f5f9; /* Light text for sidebar accent text */
+  --sidebar-border: #334155; /* Slate-700 for sidebar borders */
+  --sidebar-ring: rgba(34, 211, 238, 0.5); /* Cyan for sidebar focus ring */
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Added custom ocean-themed animations and glassmorphism utilities */
+@keyframes wave {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+  66% {
+    transform: translateY(5px) rotate(-1deg);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.animate-wave {
+  animation: wave 3s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-ripple {
+  animation: ripple 0.6s linear;
+}
+
+.glass {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.glass-strong {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
