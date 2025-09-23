@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -86,6 +86,27 @@ export default function DashboardPage() {
   })
   const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [scrollY, setScrollY] = useState(0)
+  const [droplets, setDroplets] = useState<Array<{ id: number; x: number; delay: number }>>([])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY)
+
+      // Generate droplets on scroll
+      if (window.scrollY > 50 && Math.random() > 0.97) {
+        const newDroplet = {
+          id: Date.now(),
+          x: Math.random() * window.innerWidth,
+          delay: Math.random() * 2,
+        }
+        setDroplets((prev) => [...prev.slice(-8), newDroplet])
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   const filteredFloats = mockFloatData.filter((float) => {
     if (filters.status !== "all" && float.status !== filters.status) return false
@@ -100,9 +121,51 @@ export default function DashboardPage() {
     setIsLoading(false)
   }
 
+  const skyOffset = scrollY * 0.1
+  const surfaceOffset = scrollY * 0.3
+  const deepOffset = scrollY * 0.5
+
   return (
-    <div className="min-h-screen bg-background">
-      <div className="flex h-screen">
+    <div className="min-h-screen overflow-x-hidden">
+      <div className="fixed inset-0 z-0">
+        {/* Sky Layer */}
+        <div
+          className="absolute inset-0 bg-gradient-to-b from-sky-200 via-blue-300 to-blue-500"
+          style={{ transform: `translateY(${skyOffset}px)` }}
+        />
+
+        {/* Ocean Surface Layer */}
+        <div
+          className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/50 to-blue-700"
+          style={{ transform: `translateY(${surfaceOffset}px)` }}
+        />
+
+        {/* Deep Ocean Layer */}
+        <div
+          className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-800 to-slate-900"
+          style={{
+            transform: `translateY(${deepOffset}px)`,
+            opacity: Math.min(scrollY / 1000, 0.8),
+          }}
+        />
+      </div>
+
+      <div className="fixed inset-0 z-10 pointer-events-none">
+        {droplets.map((droplet) => (
+          <div
+            key={droplet.id}
+            className="absolute w-1 h-4 bg-gradient-to-b from-blue-300 to-blue-500 rounded-full opacity-60 animate-droplet"
+            style={{
+              left: `${droplet.x}px`,
+              top: "-20px",
+              animationDelay: `${droplet.delay}s`,
+              animationDuration: "3s",
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="relative z-20 flex h-screen">
         {/* Collapsible Sidebar */}
         <div
           className={cn(
@@ -346,7 +409,7 @@ export default function DashboardPage() {
             <div className="grid lg:grid-cols-3 gap-6">
               {/* Interactive Map */}
               <div className="lg:col-span-2">
-                <Card className="glass bg-card/60 border-border/50 h-96">
+                <Card className="glass bg-card/60 border-border/50 h-50vh">
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <MapPin className="h-5 w-5 text-primary" />
@@ -356,7 +419,7 @@ export default function DashboardPage() {
                       Interactive map showing current float locations with real-time data
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="h-full">
+                  <CardContent className="">
                     <InteractiveMap
                       floats={filteredFloats}
                       selectedFloat={selectedFloat}

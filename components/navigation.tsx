@@ -30,8 +30,8 @@ export function Navigation() {
               <Waves className="h-8 w-8 text-primary group-hover:animate-wave transition-all duration-300" />
               <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg group-hover:blur-xl transition-all duration-300" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              OceanData
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 bg-clip-text text-transparent">
+              AquaSense
             </span>
           </Link>
 

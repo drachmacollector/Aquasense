@@ -40,9 +40,18 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background with ocean theme */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 via-teal-800/20 to-green-900/30">
-        <div className="absolute inset-0 bg-[url('/abstract-ocean-waves.png')] bg-cover bg-center opacity-20" />
+      <div className="absolute inset-0 bg-gradient-to-br from-sky-100 via-blue-50 to-cyan-100 dark:from-slate-900 dark:via-blue-950 dark:to-cyan-950">
+        <div className="absolute inset-0 bg-[url('/abstract-ocean-waves.png')] bg-cover bg-center opacity-30" />
+        {/* Animated water droplets */}
+        <div className="absolute top-10 left-1/4 w-2 h-2 bg-blue-400/60 rounded-full animate-droplet" />
+        <div
+          className="absolute top-20 right-1/3 w-1 h-1 bg-cyan-400/60 rounded-full animate-droplet"
+          style={{ animationDelay: "2s" }}
+        />
+        <div
+          className="absolute top-32 left-1/2 w-1.5 h-1.5 bg-blue-300/60 rounded-full animate-droplet"
+          style={{ animationDelay: "4s" }}
+        />
       </div>
 
       {/* Floating background elements */}
@@ -67,8 +76,8 @@ export default function SignupPage() {
               <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Join OceanData
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 bg-clip-text text-transparent">
+            Join AquaSense
           </CardTitle>
           <CardDescription className="text-muted-foreground">
             Create your account to start exploring ocean data
