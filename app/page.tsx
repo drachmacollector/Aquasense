@@ -107,7 +107,7 @@ export default function HomePage() {
 
           <h1 className="text-5xl md:text-7xl font-bold mb-6 text-balance">
             <span className="bg-gradient-to-r from-blue-700 via-cyan-700 to-teal-600 bg-clip-text text-transparent animate-pulse">
-              AquaSense
+              FloatChat
             </span>
             <br />
             <span className="text-white/90 text-4xl md:text-5xl">Ocean Intelligence</span>

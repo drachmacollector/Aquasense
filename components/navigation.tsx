@@ -31,7 +31,7 @@ export function Navigation() {
               <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg group-hover:blur-xl transition-all duration-300" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 bg-clip-text text-transparent">
-              AquaSense
+              FloatChat
             </span>
           </Link>
 
