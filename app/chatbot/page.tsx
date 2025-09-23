@@ -198,7 +198,7 @@ export default function ChatbotPage() {
             <div>
               <h1 className="text-2xl font-bold">
                 <span className="bg-gradient-to-r from-blue-400 via-cyan-500 to-teal-400 bg-clip-text text-transparent">
-                  AquaSense
+                  FloatChat
                 </span>
                 <span className="text-white/90 ml-2">Assistant</span>
               </h1>
