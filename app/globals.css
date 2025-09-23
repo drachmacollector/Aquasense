@@ -161,6 +161,73 @@
   }
 }
 
+/* Added new scroll-interactive animations for AquaSense landing page */
+@keyframes droplet {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+@keyframes wave-reverse {
+  0%,
+  100% {
+    transform: translateX(0px);
+  }
+  50% {
+    transform: translateX(-20px);
+  }
+}
+
+@keyframes tide {
+  0%,
+  100% {
+    transform: translateY(0px) scaleY(1);
+  }
+  50% {
+    transform: translateY(-15px) scaleY(1.1);
+  }
+}
+
+@keyframes splash {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0.8) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes bubble-rise {
+  0% {
+    transform: translateY(100px) scale(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-100px) scale(1);
+    opacity: 0;
+  }
+}
+
 .animate-wave {
   animation: wave 3s ease-in-out infinite;
 }
@@ -173,6 +240,27 @@
   animation: ripple 0.6s linear;
 }
 
+/* Added new animation classes for scroll effects */
+.animate-droplet {
+  animation: droplet linear forwards;
+}
+
+.animate-wave-reverse {
+  animation: wave-reverse 4s ease-in-out infinite;
+}
+
+.animate-tide {
+  animation: tide 2s ease-in-out infinite;
+}
+
+.animate-splash {
+  animation: splash 1.5s ease-out forwards;
+}
+
+.animate-bubble-rise {
+  animation: bubble-rise 3s ease-out infinite;
+}
+
 .glass {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -181,4 +269,20 @@
 .glass-strong {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+}
+
+/* Added smooth scrolling and enhanced glassmorphism effects */
+html {
+  scroll-behavior: smooth;
+}
+
+.glass-ocean {
+  backdrop-filter: blur(15px) saturate(180%);
+  -webkit-backdrop-filter: blur(15px) saturate(180%);
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.parallax-layer {
+  will-change: transform;
 }
