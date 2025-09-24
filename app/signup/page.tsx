@@ -77,7 +77,7 @@ export default function SignupPage() {
             </div>
           </div>
           <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 bg-clip-text text-transparent">
-            Join AquaSense
+            Join FloatChat
           </CardTitle>
           <CardDescription className="text-muted-foreground">
             Create your account to start exploring ocean data

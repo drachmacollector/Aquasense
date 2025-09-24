@@ -9,7 +9,7 @@ import { Suspense } from "react"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "AquaSense - Ocean Intelligence Platform",
+  title: "FloatChat - Ocean Intelligence Platform",
   description:
     "Dive deep into ARGO float oceanographic data with AI-powered insights, interactive visualizations, and real-time ocean exploration tools.",
   generator: "v0.app",

@@ -77,7 +77,7 @@ export default function LoginPage() {
           <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 bg-clip-text text-transparent">
             Welcome Back
           </CardTitle>
-          <CardDescription className="text-muted-foreground">Sign in to your AquaSense account</CardDescription>
+          <CardDescription className="text-muted-foreground">Sign in to your FloatChat account</CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">

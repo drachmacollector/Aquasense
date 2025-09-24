@@ -43,6 +43,8 @@ export default function ChatbotPage() {
   ])
   const [inputValue, setInputValue] = useState("")
   const [isTyping, setIsTyping] = useState(false)
+  const [messageCount, setMessageCount] = useState(1)
+  const [isMounted, setIsMounted] = useState(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [scrollY, setScrollY] = useState(0)
@@ -57,30 +59,75 @@ export default function ChatbotPage() {
     }
   }
 
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY)
+    scrollToBottom()
+  }, [messages])
 
-      // Generate droplets on scroll
-      if (window.scrollY > 50 && Math.random() > 0.97) {
-        const newDroplet = {
-          id: Date.now(),
-          x: Math.random() * window.innerWidth,
-          delay: Math.random() * 2,
-        }
-        setDroplets((prev) => [...prev.slice(-8), newDroplet])
+  // Handle scroll effects with performance optimization
+  useEffect(() => {
+    let ticking = false
+    
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setScrollY(window.scrollY)
+
+          // Generate droplets on scroll with better performance
+          if (window.scrollY > 50 && Math.random() > 0.98) {
+            const newDroplet = {
+              id: Date.now(),
+              x: Math.random() * window.innerWidth,
+              delay: Math.random() * 2,
+            }
+            setDroplets((prev) => {
+              // Keep only last 5 droplets to prevent memory leaks
+              const updated = [...prev.slice(-4), newDroplet]
+              return updated
+            })
+          }
+          ticking = false
+        })
+        ticking = true
       }
     }
 
-    window.addEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const handleSendMessage = async (content: string) => {
-    if (!content.trim()) return
+  // Cleanup old droplets
+  useEffect(() => {
+    const cleanup = setInterval(() => {
+      setDroplets(prev => prev.filter(droplet => Date.now() - droplet.id < 5000))
+    }, 5000)
+    
+    return () => clearInterval(cleanup)
+  }, [])
 
+  // Focus input on mount and handle hydration
+  useEffect(() => {
+    setIsMounted(true)
+    if (inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [])
+
+  // Safe timestamp formatter to avoid hydration issues
+  const formatTimestamp = (timestamp: Date) => {
+    // Use a consistent 24-hour format that works the same on server and client
+    const hours = timestamp.getHours().toString().padStart(2, '0')
+    const minutes = timestamp.getMinutes().toString().padStart(2, '0')
+    return `${hours}:${minutes}`
+  }
+
+  const handleSendMessage = async (content: string) => {
+    if (!content.trim() || isTyping) return
+
+    setMessageCount(prev => prev + 1)
+    
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: `user-${messageCount}`,
       content: content.trim(),
       sender: "user",
       timestamp: new Date(),
@@ -90,24 +137,70 @@ export default function ChatbotPage() {
     setInputValue("")
     setIsTyping(true)
 
-    // Simulate bot response
-    setTimeout(
-      () => {
-        const botMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          content: generateBotResponse(content),
-          sender: "bot",
-          timestamp: new Date(),
-        }
-        setMessages((prev) => [...prev, botMessage])
-        setIsTyping(false)
+    // Focus back to input after slight delay
+    setTimeout(() => {
+      inputRef.current?.focus()
+    }, 100)
+
+    try {
+      // Simulate bot response with better timing
+      const responseDelay = Math.min(content.length * 20 + 500, 2000) // Response time based on input length
+      
+      setTimeout(
+        () => {
+          const botMessage: Message = {
+            id: `bot-${messageCount}`,
+            content: generateBotResponse(content),
+            sender: "bot",
+            timestamp: new Date(),
+          }
+          setMessages((prev) => [...prev, botMessage])
+          setIsTyping(false)
+        },
+        responseDelay,
+      )
+    } catch (error) {
+      console.error('Error generating response:', error)
+      const errorMessage: Message = {
+        id: `error-${messageCount}`,
+        content: "I apologize, but I encountered an error processing your message. Please try asking your question again.",
+        sender: "bot",
+        timestamp: new Date(),
+      }
+      setMessages((prev) => [...prev, errorMessage])
+      setIsTyping(false)
+    }
+  }
+
+  const clearChat = () => {
+    setMessages([
+      {
+        id: "1",
+        content:
+          "Hello! I'm your ocean data assistant. I can help you explore ARGO float data, explain oceanographic concepts, and answer questions about marine science. What would you like to know?",
+        sender: "bot",
+        timestamp: new Date(),
       },
-      1500 + Math.random() * 1000,
-    )
+    ])
+    setMessageCount(1)
   }
 
   const generateBotResponse = (userInput: string): string => {
     const input = userInput.toLowerCase()
+
+    // Handle special commands
+    if (input.includes("clear conversation") || input.includes("clear chat")) {
+      clearChat()
+      return "I've cleared our conversation. How can I help you with ocean science today?"
+    }
+
+    if (input.includes("help me understand argo data") || input.includes("get help")) {
+      return "I can help you understand ARGO data! ARGO floats collect temperature, salinity, and pressure measurements from the ocean. You can ask me about specific parameters, regions, or how the data is collected. Try asking about 'temperature profiles', 'salinity variations', or 'ocean currents'."
+    }
+
+    if (input.includes("data visualization examples") || input.includes("view examples")) {
+      return "Here are some types of ocean data visualizations I can help you understand:\n\n• Temperature depth profiles\n• Salinity vs depth charts\n• Ocean current maps\n• Time series of temperature changes\n• Regional comparison plots\n\nWhat specific type of visualization interests you most?"
+    }
 
     if (input.includes("argo") || input.includes("float")) {
       return "ARGO floats are autonomous oceanographic instruments that drift with ocean currents and measure temperature, salinity, and pressure profiles. There are over 4,000 active floats worldwide, providing crucial data for climate research and weather prediction."
@@ -129,6 +222,26 @@ export default function ChatbotPage() {
       return "Oceans play a crucial role in climate regulation by storing and transporting heat, absorbing CO2, and influencing weather patterns. Ocean-atmosphere interactions drive phenomena like El Niño, monsoons, and hurricane formation."
     }
 
+    if (input.includes("deepest") || input.includes("depth")) {
+      return "ARGO floats typically profile to depths of 2000 meters, though some can go deeper. The deepest measurements come from Deep ARGO floats that can reach 4000-6000 meters. These deep measurements help us understand abyssal circulation and deep water formation."
+    }
+
+    if (input.includes("pacific ocean")) {
+      return "The Pacific Ocean is the largest ocean basin, showing diverse temperature patterns. The equatorial Pacific exhibits strong El Niño/La Niña cycles. Would you like to know about specific regions like the North Pacific, tropical Pacific, or Southern Ocean sectors?"
+    }
+
+    if (input.includes("atlantic")) {
+      return "The Atlantic Ocean plays a key role in global climate through the Atlantic Meridional Overturning Circulation (AMOC). It shows strong north-south temperature gradients and is crucial for heat transport to Europe. Recent data shows interesting changes in deep water formation."
+    }
+
+    if (input.includes("acidification")) {
+      return "Ocean acidification occurs as seawater absorbs CO2 from the atmosphere, lowering pH. This affects marine ecosystems, especially shell-forming organisms. ARGO biogeochemical floats now measure pH, oxygen, and other chemical parameters alongside temperature and salinity."
+    }
+
+    if (input.includes("accuracy") || input.includes("accurate")) {
+      return "ARGO measurements are highly accurate: temperature ±0.002°C, salinity ±0.01 PSU, and pressure ±2.4 dbar. Data undergoes rigorous quality control including real-time and delayed-mode processing. This accuracy makes ARGO the gold standard for ocean observations."
+    }
+
     return "That's an interesting question about ocean science! I can help you explore ARGO data, explain oceanographic processes, or discuss marine research topics. Could you be more specific about what aspect you'd like to learn about?"
   }
 
@@ -138,7 +251,20 @@ export default function ChatbotPage() {
   }
 
   const handleSuggestedQuery = (query: string) => {
+    // Handle special actions
+    if (query === "Clear conversation") {
+      clearChat()
+      return
+    }
     handleSendMessage(query)
+  }
+
+  // Enhanced keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSubmit(e as any)
+    }
   }
 
   const skyOffset = scrollY * 0.1
@@ -146,7 +272,7 @@ export default function ChatbotPage() {
   const deepOffset = scrollY * 0.5
 
   return (
-    <div className="min-h-screen overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden" role="application" aria-label="Ocean Data Chatbot">
       {/* Parallax Background Layers */}
       <div className="fixed inset-0 z-0">
         {/* Sky Layer */}
@@ -187,7 +313,7 @@ export default function ChatbotPage() {
         ))}
       </div>
 
-      <div className="relative z-20 max-w-7xl mx-auto p-4 h-screen flex flex-col">
+      <div className="relative z-20 max-w-7xl mx-auto p-4 min-h-screen flex flex-col lg:h-screen">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
@@ -208,12 +334,21 @@ export default function ChatbotPage() {
           <ThemeToggle />
         </div>
 
-        <div className="flex-1 grid lg:grid-cols-4 gap-6 min-h-0">
+        <div className="flex-1 grid lg:grid-cols-4 gap-6 min-h-0 lg:max-h-[calc(100vh-8rem)]">
           {/* Chat Area */}
           <div className="lg:col-span-3 flex flex-col min-h-0">
-            <Card className="flex-1 glass bg-blue-900/30 border-blue-400/20 backdrop-blur-sm flex flex-col min-h-0">
+            <Card 
+              className="flex-1 glass bg-blue-900/30 border-blue-400/20 backdrop-blur-sm flex flex-col min-h-0 min-h-[500px] lg:min-h-0"
+              role="log"
+              aria-label="Chat conversation"
+              aria-live="polite"
+            >
               {/* Messages */}
-              <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
+              <ScrollArea 
+                ref={scrollAreaRef} 
+                className="flex-1 p-4"
+                aria-label="Chat messages"
+              >
                 <div className="space-y-4">
                   {messages.map((message) => (
                     <div
@@ -241,14 +376,15 @@ export default function ChatbotPage() {
                             ? "bg-blue-600/20 border border-blue-400/30 text-white"
                             : "bg-blue-800/30 border border-blue-400/20 text-white",
                         )}
+                        role="article"
+                        aria-label={`${message.sender === "user" ? "Your" : "Assistant"} message`}
                       >
-                        <p className="text-sm leading-relaxed">{message.content}</p>
-                        <p className="text-xs text-blue-200/60 mt-2">
-                          {message.timestamp.toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </p>
+                        <p className="text-sm leading-relaxed whitespace-pre-line">{message.content}</p>
+                        {isMounted && (
+                          <p className="text-xs text-blue-200/60 mt-2">
+                            {formatTimestamp(message.timestamp)}
+                          </p>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -257,10 +393,10 @@ export default function ChatbotPage() {
                   {isTyping && (
                     <div className="flex items-start space-x-3 animate-in slide-in-from-bottom-2 duration-300">
                       <div className="flex-shrink-0 w-8 h-8 rounded-full bg-cyan-500/80 text-white flex items-center justify-center">
-                        <Bot className="h-4 w-4" />
+                        <Bot className="h-4 w-4 animate-pulse" />
                       </div>
                       <div className="max-w-[80%] rounded-2xl px-4 py-3 glass bg-blue-800/30 border border-blue-400/20 backdrop-blur-sm">
-                        <div className="flex items-center space-x-1">
+                        <div className="flex items-center space-x-2">
                           <div className="flex space-x-1">
                             <div className="w-2 h-2 bg-blue-300 rounded-full animate-bounce" />
                             <div
@@ -272,7 +408,7 @@ export default function ChatbotPage() {
                               style={{ animationDelay: "0.2s" }}
                             />
                           </div>
-                          <span className="text-xs text-blue-200/80 ml-2">AI is thinking...</span>
+                          <span className="text-xs text-blue-200/80">Analyzing ocean data...</span>
                         </div>
                       </div>
                     </div>
@@ -287,15 +423,19 @@ export default function ChatbotPage() {
                     ref={inputRef}
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     placeholder="Ask about ocean data, ARGO floats, or marine science..."
                     className="flex-1 glass bg-blue-800/20 border-blue-400/30 focus:border-blue-400/50 focus:ring-2 focus:ring-blue-400/20 text-white placeholder:text-blue-200/60"
                     disabled={isTyping}
+                    aria-label="Type your message here"
+                    autoComplete="off"
                   />
                   <Button
                     type="submit"
                     size="icon"
                     disabled={!inputValue.trim() || isTyping}
-                    className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 transition-all duration-300"
+                    className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 disabled:opacity-50"
+                    aria-label="Send message"
                   >
                     <Send className="h-4 w-4" />
                   </Button>
@@ -305,7 +445,7 @@ export default function ChatbotPage() {
           </div>
 
           {/* Suggested Queries Sidebar */}
-          <div className="lg:col-span-1 space-y-4">
+          <div className="lg:col-span-1 space-y-4 overflow-y-auto max-h-[600px] lg:max-h-full">
             <Card className="glass bg-blue-900/30 border-blue-400/20 backdrop-blur-sm p-4">
               <div className="flex items-center space-x-2 mb-4">
                 <Sparkles className="h-5 w-5 text-cyan-400" />
@@ -317,9 +457,10 @@ export default function ChatbotPage() {
                     key={index}
                     variant="ghost"
                     size="sm"
-                    className="w-full justify-start text-left h-auto p-3 glass bg-blue-800/20 hover:bg-blue-700/30 border border-blue-400/20 hover:border-blue-400/40 transition-all duration-300 text-white "
+                    className="w-full justify-start text-left h-auto p-3 glass bg-blue-800/20 hover:bg-blue-700/30 border border-blue-400/20 hover:border-blue-400/40 transition-all duration-300 text-white disabled:opacity-50"
                     onClick={() => handleSuggestedQuery(query)}
                     disabled={isTyping}
+                    aria-label={`Ask: ${query}`}
                   >
                     <span className="text-sm text-blue-200/80 leading-relaxed text-wrap">{query}</span>
                   </Button>
@@ -336,6 +477,7 @@ export default function ChatbotPage() {
                   size="sm"
                   className="w-full justify-start glass bg-blue-800/20 hover:bg-blue-700/30 border-blue-400/20 text-white"
                   onClick={() => handleSuggestedQuery("Clear conversation")}
+                  aria-label="Clear chat conversation"
                 >
                   Clear Chat
                 </Button>
