@@ -8,78 +8,36 @@ import { ArrowRight, BarChart3, Bot, Map, Search, Users, Droplets } from "lucide
 
 export default function HomePage() {
   const [scrollY, setScrollY] = useState(0)
-  const [droplets, setDroplets] = useState<Array<{ id: number; x: number; delay: number }>>([])
   const heroRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    let ticking = false
+    
     const handleScroll = () => {
-      setScrollY(window.scrollY)
-
-      // Generate droplets on scroll
-      if (window.scrollY > 100 && Math.random() > 0.95) {
-        const newDroplet = {
-          id: Date.now(),
-          x: Math.random() * window.innerWidth,
-          delay: Math.random() * 2,
-        }
-        setDroplets((prev) => [...prev.slice(-10), newDroplet])
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setScrollY(window.scrollY)
+          ticking = false
+        })
+        ticking = true
       }
     }
 
-    window.addEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Calculate parallax offsets
-  const skyOffset = scrollY * 0.1
-  const surfaceOffset = scrollY * 0.3
-  const deepOffset = scrollY * 0.5
-  const waveOffset = Math.sin(Date.now() * 0.001) * 10
+  // Calculate parallax offsets with reduced intensity to prevent glitching
+  const surfaceOffset = scrollY * 0.2
+  const deepOffset = scrollY * 0.4
 
   return (
     <div className="min-h-screen overflow-x-hidden">
-      {/* Parallax Background Layers */}
-      <div className="fixed inset-0 z-0">
-        {/* Sky Layer */}
-        <div
-          className="absolute inset-0 bg-gradient-to-b from-sky-200 via-blue-300 to-blue-500"
-          style={{ transform: `translateY(${skyOffset}px)` }}
-        />
-
-        {/* Ocean Surface Layer */}
-        <div
-          className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/50 to-blue-700"
-          style={{ transform: `translateY(${surfaceOffset}px)` }}
-        />
-
-        {/* Deep Ocean Layer */}
-        <div
-          className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-800 to-slate-900"
-          style={{
-            transform: `translateY(${deepOffset}px)`,
-            opacity: Math.min(scrollY / 1000, 0.8),
-          }}
-        />
-      </div>
-
-      {/* Animated Droplets */}
-      <div className="fixed inset-0 z-10 pointer-events-none">
-        {droplets.map((droplet) => (
-          <div
-            key={droplet.id}
-            className="absolute w-1 h-4 bg-gradient-to-b from-blue-300 to-blue-500 rounded-full opacity-60 animate-droplet"
-            style={{
-              left: `${droplet.x}px`,
-              top: "-20px",
-              animationDelay: `${droplet.delay}s`,
-              animationDuration: "3s",
-            }}
-          />
-        ))}
-      </div>
+      {/* Fixed Background - No parallax to prevent white sections */}
+      <div className="fixed inset-0 z-0 bg-gradient-to-b from-blue-400 via-blue-600 to-blue-900" />
 
       {/* Hero Section */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center z-20">
+      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center z-20 pt-20">
         {/* Floating Water Particles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {[...Array(6)].map((_, i) => (
@@ -98,19 +56,19 @@ export default function HomePage() {
 
         {/* Hero Content */}
         <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
-          <div className="mb-6 flex justify-center">
+          <div className="mb-8 flex justify-center">
             <div className="relative">
-              <Droplets className="h-16 w-16 text-blue-600 animate-pulse" />
-              <div className="absolute inset-0 bg-blue-400/20 rounded-full blur-xl animate-ping" />
+              <Droplets className="h-20 w-20 text-white/80 animate-pulse" />
+              <div className="absolute inset-0 bg-white/30 rounded-full blur-xl animate-ping" />
             </div>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-balance">
-            <span className="bg-gradient-to-r from-blue-700 via-cyan-700 to-teal-600 bg-clip-text text-transparent animate-pulse">
+          <h1 className="text-6xl md:text-8xl font-black mb-8 text-balance">
+            <span className="text-white drop-shadow-2xl shadow-black/50 filter">
               FloatChat
             </span>
             <br />
-            <span className="text-white/90 text-4xl md:text-5xl">Ocean Intelligence</span>
+            <span className="text-white/90 text-3xl md:text-4xl font-semibold drop-shadow-lg">Ocean Intelligence</span>
           </h1>
 
           <p className="text-xl md:text-2xl text-blue-100/80 mb-8 text-pretty max-w-2xl mx-auto">
@@ -140,50 +98,75 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Interactive Wave Animation */}
+        {/* Animated Multi-Layer Waves */}
         <div className="absolute bottom-0 left-0 right-0 h-40 overflow-hidden">
-          {/* Multiple wave layers for depth */}
+          {/* Wave Layer 1 - Fast Flowing */}
           <svg
-            className="absolute bottom-0 w-full h-32 text-blue-600/60"
-            viewBox="0 0 1200 120"
+            className="absolute bottom-0 w-[200%] h-24 text-blue-500/30 animate-wave-flow"
+            viewBox="0 0 2400 120"
             preserveAspectRatio="none"
-            style={{ transform: `translateY(${waveOffset * (-2)}px)` }}
           >
-            <path d="M0,60 C300,120 900,0 1200,60 L1200,120 L0,120 Z" fill="currentColor" className="animate-wave" />
+            <path d="M0,60 C600,120 1800,0 2400,60 L2400,120 L0,120 Z" fill="currentColor" />
           </svg>
 
+          {/* Wave Layer 2 - Pulsing */}
           <svg
-            className="absolute bottom-0 w-full h-28 text-blue-700/70"
+            className="absolute bottom-0 w-full h-28 text-blue-600/40 animate-wave-pulse"
             viewBox="0 0 1200 120"
             preserveAspectRatio="none"
-            style={{ transform: `translateY(${waveOffset * 5.0}px)` }}
           >
-            <path
-              d="M0,80 C400,20 800,100 1200,40 L1200,120 L0,120 Z"
-              fill="currentColor"
-              className="animate-wave-reverse"
-            />
+            <path d="M0,80 C400,20 800,100 1200,40 L1200,120 L0,120 Z" fill="currentColor" />
           </svg>
 
+          {/* Wave Layer 3 - Ocean Swell */}
           <svg
-            className="absolute bottom-0 w-full h-24 text-blue-800/80"
+            className="absolute bottom-0 w-[150%] h-32 text-blue-700/50 animate-ocean-swell"
+            viewBox="0 0 1800 120"
+            preserveAspectRatio="none"
+          >
+            <path d="M0,40 C450,90 1350,10 1800,70 L1800,120 L0,120 Z" fill="currentColor" />
+          </svg>
+
+          {/* Wave Layer 4 - Tide Animation */}
+          <svg
+            className="absolute bottom-0 w-full h-36 text-blue-800/60 animate-tide"
             viewBox="0 0 1200 120"
             preserveAspectRatio="none"
-            style={{ transform: `translateY(${waveOffset * 0.5}px)` }}
           >
-            <path d="M0,40 C200,80 1000,20 1200,70 L1200,120 L0,120 Z" fill="currentColor" className="animate-wave" />
+            <path d="M0,50 C300,100 900,10 1200,50 L1200,120 L0,120 Z" fill="currentColor" />
+          </svg>
+
+          {/* Wave Layer 5 - Reverse Wave */}
+          <svg
+            className="absolute bottom-0 w-full h-30 text-blue-900/70 animate-wave-reverse"
+            viewBox="0 0 1200 120"
+            preserveAspectRatio="none"
+          >
+            <path d="M0,70 C250,30 950,110 1200,70 L1200,120 L0,120 Z" fill="currentColor" />
+          </svg>
+
+          {/* Wave Layer 6 - Base Layer */}
+          <svg
+            className="absolute bottom-0 w-full h-20 text-slate-900"
+            viewBox="0 0 1200 120"
+            preserveAspectRatio="none"
+          >
+            <path d="M0,60 C350,90 850,30 1200,60 L1200,120 L0,120 Z" fill="currentColor" />
+          </svg>
+
+          {/* Wave Layer 7 - Surface Foam with Float */}
+          <svg
+            className="absolute bottom-0 w-full h-16 text-white/15 animate-float"
+            viewBox="0 0 1200 120"
+            preserveAspectRatio="none"
+          >
+            <path d="M0,80 C200,120 1000,40 1200,80 L1200,120 L0,120 Z" fill="currentColor" />
           </svg>
         </div>
       </section>
 
-      {/* Features Section with Scroll Reveal */}
-      <section
-        className="relative py-20 px-4 z-20 bg-gradient-to-b from-slate-900 via-blue-900 to-slate-900"
-        style={{
-          transform: `translateY(${scrollY * 0.1}px)`,
-          opacity: Math.max(0.3, 1 - scrollY / 2000),
-        }}
-      >
+      {/* Features Section */}
+      <section className="relative py-20 px-4 z-20 bg-slate-900">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-balance text-white">
@@ -196,74 +179,74 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="p-6 glass bg-blue-900/30 hover:bg-blue-800/40 transition-all duration-300 group border-blue-400/20 backdrop-blur-sm">
+            <Card className="p-6 bg-white/95 dark:bg-slate-800/95 hover:bg-white dark:hover:bg-slate-800 transition-all duration-300 group border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl">
               <div className="flex items-center mb-4">
-                <div className="p-3 bg-blue-500/20 rounded-lg group-hover:bg-blue-500/30 transition-colors">
-                  <Search className="h-6 w-6 text-blue-400" />
+                <div className="p-3 bg-blue-500/10 rounded-lg group-hover:bg-blue-500/20 transition-colors">
+                  <Search className="h-6 w-6 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-semibold ml-4 text-white">Data Exploration</h3>
+                <h3 className="text-xl font-semibold ml-4 text-slate-900 dark:text-white">Data Exploration</h3>
               </div>
-              <p className="text-blue-200/80">
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
                 Browse and filter ARGO float data with advanced search capabilities and timeline navigation.
               </p>
             </Card>
 
-            <Card className="p-6 glass bg-blue-900/30 hover:bg-blue-800/40 transition-all duration-300 group border-blue-400/20 backdrop-blur-sm">
+            <Card className="p-6 bg-white/95 dark:bg-slate-800/95 hover:bg-white dark:hover:bg-slate-800 transition-all duration-300 group border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl">
               <div className="flex items-center mb-4">
-                <div className="p-3 bg-cyan-500/20 rounded-lg group-hover:bg-cyan-500/30 transition-colors">
-                  <Map className="h-6 w-6 text-cyan-400" />
+                <div className="p-3 bg-cyan-500/10 rounded-lg group-hover:bg-cyan-500/20 transition-colors">
+                  <Map className="h-6 w-6 text-cyan-600" />
                 </div>
-                <h3 className="text-xl font-semibold ml-4 text-white">Interactive Maps</h3>
+                <h3 className="text-xl font-semibold ml-4 text-slate-900 dark:text-white">Interactive Maps</h3>
               </div>
-              <p className="text-blue-200/80">
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
                 Visualize ARGO float positions on interactive maps with real-time data overlays and tooltips.
               </p>
             </Card>
 
-            <Card className="p-6 glass bg-blue-900/30 hover:bg-blue-800/40 transition-all duration-300 group border-blue-400/20 backdrop-blur-sm">
+            <Card className="p-6 bg-white/95 dark:bg-slate-800/95 hover:bg-white dark:hover:bg-slate-800 transition-all duration-300 group border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl">
               <div className="flex items-center mb-4">
-                <div className="p-3 bg-teal-500/20 rounded-lg group-hover:bg-teal-500/30 transition-colors">
-                  <BarChart3 className="h-6 w-6 text-teal-400" />
+                <div className="p-3 bg-teal-500/10 rounded-lg group-hover:bg-teal-500/20 transition-colors">
+                  <BarChart3 className="h-6 w-6 text-teal-600" />
                 </div>
-                <h3 className="text-xl font-semibold ml-4 text-white">Data Visualization</h3>
+                <h3 className="text-xl font-semibold ml-4 text-slate-900 dark:text-white">Data Visualization</h3>
               </div>
-              <p className="text-blue-200/80">
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
                 Create dynamic charts and graphs to analyze depth-time profiles and parameter comparisons.
               </p>
             </Card>
 
-            <Card className="p-6 glass bg-blue-900/30 hover:bg-blue-800/40 transition-all duration-300 group border-blue-400/20 backdrop-blur-sm">
+            <Card className="p-6 bg-white/95 dark:bg-slate-800/95 hover:bg-white dark:hover:bg-slate-800 transition-all duration-300 group border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl">
               <div className="flex items-center mb-4">
-                <div className="p-3 bg-indigo-500/20 rounded-lg group-hover:bg-indigo-500/30 transition-colors">
-                  <Bot className="h-6 w-6 text-indigo-400" />
+                <div className="p-3 bg-indigo-500/10 rounded-lg group-hover:bg-indigo-500/20 transition-colors">
+                  <Bot className="h-6 w-6 text-indigo-600" />
                 </div>
-                <h3 className="text-xl font-semibold ml-4 text-white">AI Assistant</h3>
+                <h3 className="text-xl font-semibold ml-4 text-slate-900 dark:text-white">AI Assistant</h3>
               </div>
-              <p className="text-blue-200/80">
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
                 Get intelligent insights and answers about ocean data through our AI-powered chatbot interface.
               </p>
             </Card>
 
-            <Card className="p-6 glass bg-blue-900/30 hover:bg-blue-800/40 transition-all duration-300 group border-blue-400/20 backdrop-blur-sm">
+            <Card className="p-6 bg-white/95 dark:bg-slate-800/95 hover:bg-white dark:hover:bg-slate-800 transition-all duration-300 group border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl">
               <div className="flex items-center mb-4">
-                <div className="p-3 bg-emerald-500/20 rounded-lg group-hover:bg-emerald-500/30 transition-colors">
-                  <Users className="h-6 w-6 text-emerald-400" />
+                <div className="p-3 bg-emerald-500/10 rounded-lg group-hover:bg-emerald-500/20 transition-colors">
+                  <Users className="h-6 w-6 text-emerald-600" />
                 </div>
-                <h3 className="text-xl font-semibold ml-4 text-white">Collaboration</h3>
+                <h3 className="text-xl font-semibold ml-4 text-slate-900 dark:text-white">Collaboration</h3>
               </div>
-              <p className="text-blue-200/80">
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
                 Share discoveries and collaborate with researchers worldwide through our platform.
               </p>
             </Card>
 
-            <Card className="p-6 glass bg-blue-900/30 hover:bg-blue-800/40 transition-all duration-300 group border-blue-400/20 backdrop-blur-sm">
+            <Card className="p-6 bg-white/95 dark:bg-slate-800/95 hover:bg-white dark:hover:bg-slate-800 transition-all duration-300 group border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl">
               <div className="flex items-center mb-4">
-                <div className="p-3 bg-orange-500/20 rounded-lg group-hover:bg-orange-500/30 transition-colors">
-                  <BarChart3 className="h-6 w-6 text-orange-400" />
+                <div className="p-3 bg-orange-500/10 rounded-lg group-hover:bg-orange-500/20 transition-colors">
+                  <BarChart3 className="h-6 w-6 text-orange-600" />
                 </div>
-                <h3 className="text-xl font-semibold ml-4 text-white">Real-time Updates</h3>
+                <h3 className="text-xl font-semibold ml-4 text-slate-900 dark:text-white">Real-time Updates</h3>
               </div>
-              <p className="text-blue-200/80">
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
                 Access the latest oceanographic data with real-time updates from ARGO float networks.
               </p>
             </Card>
