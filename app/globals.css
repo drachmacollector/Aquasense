@@ -442,3 +442,36 @@ html {
 .animate-float-dock {
   animation: float-dock 4s ease-in-out infinite;
 }
+
+/* Horizontal wave animations for seamless transitions */
+@keyframes wave-horizontal {
+  0% {
+    transform: translateX(-100px);
+  }
+  50% {
+    transform: translateX(100px);
+  }
+  100% {
+    transform: translateX(-100px);
+  }
+}
+
+@keyframes wave-horizontal-reverse {
+  0% {
+    transform: translateX(100px);
+  }
+  50% {
+    transform: translateX(-100px);
+  }
+  100% {
+    transform: translateX(100px);
+  }
+}
+
+.animate-wave-horizontal {
+  animation: wave-horizontal 6s ease-in-out infinite;
+}
+
+.animate-wave-horizontal-reverse {
+  animation: wave-horizontal-reverse 8s ease-in-out infinite;
+}

@@ -61,7 +61,7 @@ export default function HomePage() {
         </div>
 
         {/* Bottom-positioned CTAs (centered) */}
-        <div className="absolute left-0 right-0 bottom-8 flex justify-center z-20 px-4">
+        <div className="absolute left-0 right-0 bottom-16 flex justify-center z-20 px-4">
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               asChild
@@ -86,7 +86,27 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="relative py-20 px-4 z-20 bg-slate-900">
+      <section className="relative pt-32 pb-20 px-4 z-20 bg-slate-900">
+        {/* Animated wave overlay - creates seamless transition from video */}
+        <div className="absolute -top-20 left-0 right-0 h-32 overflow-hidden">
+          <svg
+            className="absolute top-0 w-[120%] h-32 text-slate-900 animate-wave-horizontal"
+            viewBox="0 0 1440 120"
+            preserveAspectRatio="none"
+            style={{ left: '-10%' }}
+          >
+            <path d="M0,60 C360,120 1080,0 1440,60 L1440,120 L0,120 Z" fill="currentColor" />
+          </svg>
+          <svg
+            className="absolute top-4 w-[120%] h-28 text-slate-900 opacity-70 animate-wave-horizontal-reverse"
+            viewBox="0 0 1440 120"
+            preserveAspectRatio="none"
+            style={{ left: '-10%' }}
+          >
+            <path d="M0,80 C480,20 960,100 1440,70 L1440,120 L0,120 Z" fill="currentColor" />
+          </svg>
+        </div>
+        
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-balance text-white">
