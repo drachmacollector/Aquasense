@@ -26,7 +26,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <Suspense fallback={<div>Loading...</div>}>
             <Navigation />
-            <main className="pt-16">{children}</main>
+            <main className="pt-0">{children}</main>
           </Suspense>
         </ThemeProvider>
         <Analytics />

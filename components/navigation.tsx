@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -19,9 +19,40 @@ const navigation = [
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
+  const [hidden, setHidden] = useState(false)
+  const lastScrollY = useRef(0)
+  const ticking = useRef(false)
+
+  useEffect(() => {
+    const onScroll = () => {
+      const currentY = window.scrollY || 0
+      if (!ticking.current) {
+        window.requestAnimationFrame(() => {
+          // If scrolling down and passed small threshold, hide nav
+          if (currentY > lastScrollY.current && currentY > 20) {
+            setHidden(true)
+          } else if (currentY < lastScrollY.current) {
+            // Scrolling up -> show nav
+            setHidden(false)
+          }
+          lastScrollY.current = currentY
+          ticking.current = false
+        })
+        ticking.current = true
+      }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
-    <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-auto animate-float-dock">
+    <nav
+      className={cn(
+        "fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-auto animate-float-dock transition-transform transition-opacity duration-300",
+        hidden ? "-translate-y-24 opacity-90 pointer-events-none" : "translate-y-0 opacity-100",
+      )}
+    >
       <div className="relative bg-black/40 backdrop-blur-md rounded-2xl px-6 py-3 transition-all duration-300 hover:shadow-2xl border border-white/20">
         {/* Enhanced glassmorphic background effects */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-cyan-500/15 to-teal-500/10 rounded-2xl"></div>
