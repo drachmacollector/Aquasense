@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowRight, BarChart3, Bot, Map, Search, Users, Droplets } from "lucide-react"
+import { ArrowRight, BarChart3, Bot, Map, Search, Users } from "lucide-react"
 
 export default function HomePage() {
   const [scrollY, setScrollY] = useState(0)
@@ -33,49 +33,35 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen overflow-x-hidden">
-      {/* Fixed Background - No parallax to prevent white sections */}
-      <div className="fixed inset-0 z-0 bg-gradient-to-b from-blue-400 via-blue-600 to-blue-900" />
+      {/* Background video (full-bleed) with dark overlay for legibility */}
+      <div className="fixed inset-0 z-0">
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          src="/floatchat-video.mp4"
+          autoPlay
+          loop
+          playsInline
+          aria-hidden="true"
+          style={{ transform: "scale(1.05)", transformOrigin: "center" }}
+        />
+      </div>
 
       {/* Hero Section */}
       <section ref={heroRef} className="relative min-h-screen flex items-center justify-center z-20 pt-20">
-        {/* Floating Water Particles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 bg-blue-400/30 rounded-full animate-float blur-sm"
-              style={{
-                left: `${20 + i * 15}%`,
-                top: `${30 + (i % 3) * 20}%`,
-                animationDelay: `${i * 0.8}s`,
-                animationDuration: `${4 + i * 0.5}s`,
-              }}
-            />
-          ))}
-        </div>
+        {/* Floating particles removed to reduce distraction over video background */}
 
         {/* Hero Content */}
-        <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
-          <div className="mb-8 flex justify-center">
-            <div className="relative">
-              <Droplets className="h-20 w-20 text-white/80 animate-pulse" />
-              <div className="absolute inset-0 bg-white/30 rounded-full blur-xl animate-ping" />
-            </div>
+        <div className="relative z-10 text-center max-w-xl mx-auto px-4 mt-40">
+          {/* Simple hero text - smaller and further down */}
+          <div className="bg-black/40 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
+            <p className="text-sm md:text-base text-white/90 font-normal mb-0 drop-shadow-md">
+              Explore ARGO ocean data with AI-powered insights
+            </p>
           </div>
+        </div>
 
-          <h1 className="text-6xl md:text-8xl font-black mb-8 text-balance">
-            <span className="text-white drop-shadow-2xl shadow-black/50 filter">
-              FloatChat
-            </span>
-            <br />
-            <span className="text-white/90 text-3xl md:text-4xl font-semibold drop-shadow-lg">Ocean Intelligence</span>
-          </h1>
-
-          <p className="text-xl md:text-2xl text-blue-100/80 mb-8 text-pretty max-w-2xl mx-auto">
-            Dive deep into ARGO float data with AI-powered insights, interactive visualizations, and real-time ocean
-            exploration tools.
-          </p>
-
+        {/* Bottom-positioned CTAs (centered) */}
+        <div className="absolute left-0 right-0 bottom-8 flex justify-center z-20 px-4">
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               asChild
@@ -96,72 +82,6 @@ export default function HomePage() {
               <Link href="/dashboard">View Dashboard</Link>
             </Button>
           </div>
-        </div>
-
-        {/* Animated Multi-Layer Waves */}
-        <div className="absolute bottom-0 left-0 right-0 h-40 overflow-hidden">
-          {/* Wave Layer 1 - Fast Flowing */}
-          <svg
-            className="absolute bottom-0 w-[200%] h-24 text-blue-500/30 animate-wave-flow"
-            viewBox="0 0 2400 120"
-            preserveAspectRatio="none"
-          >
-            <path d="M0,60 C600,120 1800,0 2400,60 L2400,120 L0,120 Z" fill="currentColor" />
-          </svg>
-
-          {/* Wave Layer 2 - Pulsing */}
-          <svg
-            className="absolute bottom-0 w-full h-28 text-blue-600/40 animate-wave-pulse"
-            viewBox="0 0 1200 120"
-            preserveAspectRatio="none"
-          >
-            <path d="M0,80 C400,20 800,100 1200,40 L1200,120 L0,120 Z" fill="currentColor" />
-          </svg>
-
-          {/* Wave Layer 3 - Ocean Swell */}
-          <svg
-            className="absolute bottom-0 w-[150%] h-32 text-blue-700/50 animate-ocean-swell"
-            viewBox="0 0 1800 120"
-            preserveAspectRatio="none"
-          >
-            <path d="M0,40 C450,90 1350,10 1800,70 L1800,120 L0,120 Z" fill="currentColor" />
-          </svg>
-
-          {/* Wave Layer 4 - Tide Animation */}
-          <svg
-            className="absolute bottom-0 w-full h-36 text-blue-800/60 animate-tide"
-            viewBox="0 0 1200 120"
-            preserveAspectRatio="none"
-          >
-            <path d="M0,50 C300,100 900,10 1200,50 L1200,120 L0,120 Z" fill="currentColor" />
-          </svg>
-
-          {/* Wave Layer 5 - Reverse Wave */}
-          <svg
-            className="absolute bottom-0 w-full h-30 text-blue-900/70 animate-wave-reverse"
-            viewBox="0 0 1200 120"
-            preserveAspectRatio="none"
-          >
-            <path d="M0,70 C250,30 950,110 1200,70 L1200,120 L0,120 Z" fill="currentColor" />
-          </svg>
-
-          {/* Wave Layer 6 - Base Layer */}
-          <svg
-            className="absolute bottom-0 w-full h-20 text-slate-900"
-            viewBox="0 0 1200 120"
-            preserveAspectRatio="none"
-          >
-            <path d="M0,60 C350,90 850,30 1200,60 L1200,120 L0,120 Z" fill="currentColor" />
-          </svg>
-
-          {/* Wave Layer 7 - Surface Foam with Float */}
-          <svg
-            className="absolute bottom-0 w-full h-16 text-white/15 animate-float"
-            viewBox="0 0 1200 120"
-            preserveAspectRatio="none"
-          >
-            <path d="M0,80 C200,120 1000,40 1200,80 L1200,120 L0,120 Z" fill="currentColor" />
-          </svg>
         </div>
       </section>
 

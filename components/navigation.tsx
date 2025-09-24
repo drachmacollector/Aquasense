@@ -22,21 +22,21 @@ export function Navigation() {
 
   return (
     <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-auto animate-float-dock">
-      <div className="relative glass-nav dark:glass-nav-dark rounded-2xl px-6 py-3 transition-all duration-300 hover:shadow-2xl">
+      <div className="relative bg-black/40 backdrop-blur-md rounded-2xl px-6 py-3 transition-all duration-300 hover:shadow-2xl border border-white/20">
         {/* Enhanced glassmorphic background effects */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/8 via-cyan-500/12 to-teal-500/8 rounded-2xl opacity-60"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent rounded-2xl"></div>
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-cyan-500/15 to-teal-500/10 rounded-2xl"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-white/8 to-transparent rounded-2xl"></div>
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent"></div>
         
         <div className="relative flex items-center space-x-1">
           {/* Logo - Compact for dock */}
           <Link href="/" className="flex items-center group mr-4">
             <div className="relative">
-              <Waves className="h-6 w-6 text-blue-400 group-hover:animate-wave transition-all duration-300" />
+              <Waves className="h-6 w-6 text-white group-hover:animate-wave transition-all duration-300 drop-shadow-lg" />
               <div className="absolute inset-0 bg-blue-400/20 rounded-full blur-md group-hover:blur-lg transition-all duration-300" />
             </div>
-            <span className="ml-2 text-lg font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent hidden sm:inline">
-              Aquasense
+            <span className="ml-2 text-lg font-bold text-white drop-shadow-lg hidden sm:inline">
+              FloatChat
             </span>
           </Link>
 
@@ -47,10 +47,10 @@ export function Navigation() {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "relative px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 group hover:scale-105",
+                  "relative px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 group hover:scale-105 drop-shadow-lg",
                   pathname === item.href 
-                    ? "bg-white/20 dark:bg-white/10 text-blue-600 dark:text-blue-400 shadow-lg backdrop-blur-sm border border-white/30" 
-                    : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white/10 dark:hover:bg-white/5",
+                    ? "bg-white/25 text-white shadow-lg backdrop-blur-sm border border-white/40" 
+                    : "text-white/90 hover:text-white hover:bg-white/15",
                 )}
               >
                 <span className="relative z-10">{item.name}</span>
@@ -71,9 +71,9 @@ export function Navigation() {
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="relative bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/10 rounded-xl border border-white/20 p-2 transition-all duration-300 hover:scale-105"
+                  className="relative bg-white/15 hover:bg-white/25 rounded-xl border border-white/30 p-2 transition-all duration-300 hover:scale-105 drop-shadow-lg"
                 >
-                  <Menu className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                  <Menu className="h-5 w-5 text-white" />
                 </Button>
               </SheetTrigger>
               <SheetContent 
