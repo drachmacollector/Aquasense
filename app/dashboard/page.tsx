@@ -86,27 +86,6 @@ export default function DashboardPage() {
   })
   const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [scrollY, setScrollY] = useState(0)
-  const [droplets, setDroplets] = useState<Array<{ id: number; x: number; delay: number }>>([])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY)
-
-      // Generate droplets on scroll
-      if (window.scrollY > 50 && Math.random() > 0.97) {
-        const newDroplet = {
-          id: Date.now(),
-          x: Math.random() * window.innerWidth,
-          delay: Math.random() * 2,
-        }
-        setDroplets((prev) => [...prev.slice(-8), newDroplet])
-      }
-    }
-
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
 
   const filteredFloats = mockFloatData.filter((float) => {
     if (filters.status !== "all" && float.status !== filters.status) return false
@@ -121,72 +100,64 @@ export default function DashboardPage() {
     setIsLoading(false)
   }
 
-  const skyOffset = scrollY * 0.1
-  const surfaceOffset = scrollY * 0.3
-  const deepOffset = scrollY * 0.5
-
   return (
-    <div className="min-h-screen overflow-x-hidden">
+    <div className="min-h-screen overflow-hidden">
+      {/* Ocean-themed layered background */}
       <div className="fixed inset-0 z-0">
-        {/* Sky Layer */}
-        <div
-          className="absolute inset-0 bg-gradient-to-b from-sky-200 via-blue-300 to-blue-500"
-          style={{ transform: `translateY(${skyOffset}px)` }}
-        />
-
-        {/* Ocean Surface Layer */}
-        <div
-          className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/50 to-blue-700"
-          style={{ transform: `translateY(${surfaceOffset}px)` }}
-        />
-
-        {/* Deep Ocean Layer */}
-        <div
-          className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-800 to-slate-900"
-          style={{
-            transform: `translateY(${deepOffset}px)`,
-            opacity: Math.min(scrollY / 1000, 0.8),
-          }}
-        />
+        {/* Deep ocean base layer */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-cyan-900" />
+        
+        {/* Ocean surface layer with movement */}
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-400/30 via-cyan-500/20 to-transparent animate-wave-pulse" />
+        
+        {/* Light rays and caustics */}
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-300/10 via-transparent to-blue-600/10 animate-ocean-swell" />
+        
+        {/* Floating particles */}
+        <div className="absolute top-20 left-20 w-2 h-2 bg-cyan-300/40 rounded-full animate-float" />
+        <div className="absolute top-40 right-32 w-3 h-3 bg-blue-300/30 rounded-full animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-60 left-1/3 w-1 h-1 bg-cyan-400/50 rounded-full animate-float" style={{ animationDelay: '4s' }} />
+        <div className="absolute bottom-40 right-1/4 w-2 h-2 bg-blue-400/40 rounded-full animate-float" style={{ animationDelay: '1s' }} />
+        
+        {/* Subtle grid overlay for data feel */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="w-full h-full" style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px'
+          }} />
+        </div>
       </div>
 
-      <div className="fixed inset-0 z-10 pointer-events-none">
-        {droplets.map((droplet) => (
-          <div
-            key={droplet.id}
-            className="absolute w-1 h-4 bg-gradient-to-b from-blue-300 to-blue-500 rounded-full opacity-60 animate-droplet"
-            style={{
-              left: `${droplet.x}px`,
-              top: "-20px",
-              animationDelay: `${droplet.delay}s`,
-              animationDuration: "3s",
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="relative z-20 flex h-screen">
+      <div className="relative z-10 flex min-h-screen">
         {/* Collapsible Sidebar */}
         <div
           className={cn(
-            "bg-card/60 glass border-r border-border/50 transition-all duration-300 flex flex-col",
+            "backdrop-blur-xl bg-white/10 border-r border-white/20 transition-all duration-300 flex flex-col shadow-2xl",
             sidebarCollapsed ? "w-16" : "w-80",
           )}
+          style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+            borderRight: '1px solid rgba(255,255,255,0.2)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+          }}
         >
           {/* Sidebar Header */}
-          <div className="p-4 border-b border-border/50">
+          <div className="p-4 border-b border-white/10 bg-gradient-to-r from-white/10 to-cyan-300/10">
             <div className="flex items-center justify-between">
               {!sidebarCollapsed && (
                 <div>
-                  <h2 className="text-lg font-semibold text-foreground">Dashboard</h2>
-                  <p className="text-sm text-muted-foreground">ARGO Float Data</p>
+                  <h2 className="text-lg font-semibold text-white drop-shadow-md">Dashboard</h2>
+                  <p className="text-sm text-cyan-100">ARGO Float Data</p>
                 </div>
               )}
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                className="hover:bg-muted/50"
+                className="hover:bg-white/20 text-white border-white/20 hover:border-white/30 backdrop-blur-sm"
               >
                 {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
               </Button>
@@ -198,35 +169,35 @@ export default function DashboardPage() {
               {/* Filters Section */}
               <div className="p-4 space-y-4">
                 <div className="flex items-center space-x-2">
-                  <Filter className="h-4 w-4 text-primary" />
-                  <h3 className="font-medium text-foreground">Filters</h3>
+                  <Filter className="h-4 w-4 text-cyan-300" />
+                  <h3 className="font-medium text-white drop-shadow-md">Filters</h3>
                 </div>
 
                 {/* Search */}
                 <div className="space-y-2">
-                  <Label htmlFor="search" className="text-sm">
+                  <Label htmlFor="search" className="text-sm text-cyan-100 font-medium">
                     Search Float ID
                   </Label>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-cyan-300" />
                     <Input
                       id="search"
                       placeholder="Enter float ID..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 glass bg-input/50 border-border/50"
+                      className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-cyan-200 focus:border-cyan-300 focus:ring-cyan-300/20 backdrop-blur-sm"
                     />
                   </div>
                 </div>
 
                 {/* Date Range */}
                 <div className="space-y-2">
-                  <Label className="text-sm">Date Range</Label>
+                  <Label className="text-sm text-cyan-100 font-medium">Date Range</Label>
                   <Select
                     value={filters.dateRange}
                     onValueChange={(value) => setFilters((prev) => ({ ...prev, dateRange: value }))}
                   >
-                    <SelectTrigger className="glass bg-input/50 border-border/50">
+                    <SelectTrigger className="bg-white/10 border-white/20 text-white focus:border-cyan-300 focus:ring-cyan-300/20 backdrop-blur-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -240,12 +211,12 @@ export default function DashboardPage() {
 
                 {/* Region */}
                 <div className="space-y-2">
-                  <Label className="text-sm">Region</Label>
+                  <Label className="text-sm text-cyan-100 font-medium">Region</Label>
                   <Select
                     value={filters.region}
                     onValueChange={(value) => setFilters((prev) => ({ ...prev, region: value }))}
                   >
-                    <SelectTrigger className="glass bg-input/50 border-border/50">
+                    <SelectTrigger className="bg-white/10 border-white/20 text-white focus:border-cyan-300 focus:ring-cyan-300/20 backdrop-blur-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -260,12 +231,12 @@ export default function DashboardPage() {
 
                 {/* Parameter */}
                 <div className="space-y-2">
-                  <Label className="text-sm">Primary Parameter</Label>
+                  <Label className="text-sm text-cyan-100 font-medium">Primary Parameter</Label>
                   <Select
                     value={filters.parameter}
                     onValueChange={(value) => setFilters((prev) => ({ ...prev, parameter: value }))}
                   >
-                    <SelectTrigger className="glass bg-input/50 border-border/50">
+                    <SelectTrigger className="bg-white/10 border-white/20 text-white focus:border-cyan-300 focus:ring-cyan-300/20 backdrop-blur-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -279,12 +250,12 @@ export default function DashboardPage() {
 
                 {/* Status */}
                 <div className="space-y-2">
-                  <Label className="text-sm">Status</Label>
+                  <Label className="text-sm text-cyan-100 font-medium">Status</Label>
                   <Select
                     value={filters.status}
                     onValueChange={(value) => setFilters((prev) => ({ ...prev, status: value }))}
                   >
-                    <SelectTrigger className="glass bg-input/50 border-border/50">
+                    <SelectTrigger className="bg-white/10 border-white/20 text-white focus:border-cyan-300 focus:ring-cyan-300/20 backdrop-blur-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -298,7 +269,7 @@ export default function DashboardPage() {
                 <Button
                   onClick={handleRefresh}
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
+                  className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg backdrop-blur-sm border border-white/20 hover:border-white/30"
                 >
                   {isLoading ? (
                     <>
@@ -314,62 +285,62 @@ export default function DashboardPage() {
                 </Button>
               </div>
 
-              <Separator className="bg-border/50" />
+              <Separator className="bg-white/20" />
 
               {/* Float List */}
-              <div className="flex-1 p-4">
+              <div className="flex-1 p-4 overflow-hidden">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-medium text-foreground">Active Floats</h3>
-                  <Badge variant="secondary" className="glass bg-primary/10 text-primary">
+                  <h3 className="font-medium text-white drop-shadow-md">Active Floats</h3>
+                  <Badge variant="secondary" className="bg-cyan-400/20 text-cyan-100 border-cyan-300/30 backdrop-blur-sm">
                     {filteredFloats.length}
                   </Badge>
                 </div>
 
-                <ScrollArea className="h-full">
+                <ScrollArea className="h-[calc(100vh-400px)] enhanced-scroll">
                   <div className="space-y-3">
                     {filteredFloats.map((float) => (
                       <Card
                         key={float.id}
                         className={cn(
-                          "glass bg-card/40 border-border/30 hover:bg-card/60 hover:border-border/50 transition-all duration-300 cursor-pointer group",
-                          selectedFloat === float.id && "bg-primary/10 border-primary/30",
+                          "backdrop-blur-md bg-slate-800/60 border-white/20 hover:bg-slate-800/70 hover:border-white/30 transition-all duration-300 cursor-pointer group shadow-lg",
+                          selectedFloat === float.id && "bg-cyan-600/30 border-cyan-300/60 shadow-xl ring-2 ring-cyan-300/40",
                         )}
                         onClick={() => setSelectedFloat(float.id)}
                       >
                         <CardContent className="p-3">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center space-x-2">
-                              <MapPin className="h-4 w-4 text-primary" />
-                              <span className="font-medium text-sm">{float.id}</span>
+                              <MapPin className="h-4 w-4 text-cyan-200" />
+                              <span className="font-medium text-sm text-white drop-shadow-sm">{float.id}</span>
                             </div>
                             <Badge
                               variant={float.status === "active" ? "default" : "secondary"}
                               className={cn(
-                                "text-xs",
+                                "text-xs backdrop-blur-sm",
                                 float.status === "active"
-                                  ? "bg-green-500/10 text-green-600 border-green-500/20"
-                                  : "bg-gray-500/10 text-gray-600 border-gray-500/20",
+                                  ? "bg-green-500/25 text-green-100 border-green-400/50"
+                                  : "bg-gray-500/25 text-gray-100 border-gray-400/50",
                               )}
                             >
                               {float.status}
                             </Badge>
                           </div>
 
-                          <div className="space-y-1 text-xs text-muted-foreground">
+                          <div className="space-y-1 text-xs text-cyan-50">
                             <div className="flex items-center space-x-1">
-                              <Thermometer className="h-3 w-3" />
+                              <Thermometer className="h-3 w-3 text-red-300" />
                               <span>{float.temperature}°C</span>
                             </div>
                             <div className="flex items-center space-x-1">
-                              <Droplets className="h-3 w-3" />
+                              <Droplets className="h-3 w-3 text-blue-300" />
                               <span>{float.salinity} PSU</span>
                             </div>
                             <div className="flex items-center space-x-1">
-                              <Gauge className="h-3 w-3" />
+                              <Gauge className="h-3 w-3 text-purple-300" />
                               <span>{float.pressure} dbar</span>
                             </div>
                             <div className="flex items-center space-x-1">
-                              <Calendar className="h-3 w-3" />
+                              <Calendar className="h-3 w-3 text-cyan-200" />
                               <span>{new Date(float.lastUpdate).toLocaleDateString()}</span>
                             </div>
                           </div>
@@ -386,16 +357,16 @@ export default function DashboardPage() {
         {/* Main Content */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* Header */}
-          <div className="p-6 border-b border-border/50 bg-card/30 glass">
+          <div className="p-6 border-b border-white/20 backdrop-blur-xl bg-gradient-to-r from-white/10 to-cyan-400/10">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold text-white drop-shadow-lg">
                   Ocean Data Dashboard
                 </h1>
-                <p className="text-muted-foreground">Real-time ARGO float monitoring and analysis</p>
+                <p className="text-cyan-100">Real-time ARGO float monitoring and analysis</p>
               </div>
               <div className="flex items-center space-x-2">
-                <Button variant="outline" size="sm" className="glass bg-card/50 border-border/50">
+                <Button variant="outline" size="sm" className="bg-white/10 border-white/30 hover:bg-white/20 hover:border-white/40 text-white backdrop-blur-sm">
                   <Download className="h-4 w-4 mr-2" />
                   Export Data
                 </Button>
@@ -406,91 +377,93 @@ export default function DashboardPage() {
           {/* Dashboard Content */}
           <div className="flex-1 p-6 space-y-6 overflow-auto">
             {/* Map and Summary Cards */}
-            <div className="grid lg:grid-cols-3 gap-6">
+            <div className="grid lg:grid-cols-12 gap-6">
               {/* Interactive Map */}
-              <div className="lg:col-span-2">
-                <Card className="glass bg-card/60 border-border/50 h-50vh">
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <MapPin className="h-5 w-5 text-primary" />
+              <div className="lg:col-span-9">
+                <Card className="backdrop-blur-xl bg-slate-900/80 border-white/20 shadow-2xl h-[500px]">
+                  <CardHeader className="bg-gradient-to-r from-slate-800/60 to-blue-900/60 border-b border-white/20 pb-4">
+                    <CardTitle className="flex items-center space-x-2 text-white drop-shadow-md">
+                      <MapPin className="h-5 w-5 text-cyan-300" />
                       <span>ARGO Float Positions</span>
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-cyan-100 mt-1">
                       Interactive map showing current float locations with real-time data
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="">
-                    <InteractiveMap
-                      floats={filteredFloats}
-                      selectedFloat={selectedFloat}
-                      onFloatSelect={setSelectedFloat}
-                    />
+                  <CardContent className="p-4 h-[400px]">
+                    <div className="map-container h-full p-2">
+                      <InteractiveMap
+                        floats={filteredFloats}
+                        selectedFloat={selectedFloat}
+                        onFloatSelect={setSelectedFloat}
+                      />
+                    </div>
                   </CardContent>
                 </Card>
               </div>
 
               {/* Summary Cards */}
-              <div className="space-y-4">
-                <Card className="glass bg-card/60 border-border/50 hover:bg-card/70 transition-all duration-300 group">
+              <div className="lg:col-span-3 space-y-4">
+                <Card className="backdrop-blur-xl bg-slate-800/70 border-white/20 hover:bg-slate-800/80 card-hover-lift transition-all duration-300 group shadow-lg">
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-                        <MapPin className="h-6 w-6 text-primary" />
+                      <div className="p-2.5 bg-cyan-400/25 rounded-lg group-hover:bg-cyan-400/35 transition-colors backdrop-blur-sm">
+                        <MapPin className="h-6 w-6 text-cyan-200" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-foreground">{filteredFloats.length}</p>
-                        <p className="text-sm text-muted-foreground">Active Floats</p>
+                        <p className="text-2xl font-bold text-white drop-shadow-md">{filteredFloats.length}</p>
+                        <p className="text-sm text-cyan-100">Active Floats</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="glass bg-card/60 border-border/50 hover:bg-card/70 transition-all duration-300 group">
+                <Card className="backdrop-blur-xl bg-slate-800/70 border-white/20 hover:bg-slate-800/80 card-hover-lift transition-all duration-300 group shadow-lg">
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-accent/10 rounded-lg group-hover:bg-accent/20 transition-colors">
-                        <Thermometer className="h-6 w-6 text-accent" />
+                      <div className="p-2.5 bg-red-400/25 rounded-lg group-hover:bg-red-400/35 transition-colors backdrop-blur-sm">
+                        <Thermometer className="h-6 w-6 text-red-200" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-foreground">
+                        <p className="text-2xl font-bold text-white drop-shadow-md">
                           {(filteredFloats.reduce((sum, f) => sum + f.temperature, 0) / filteredFloats.length).toFixed(
                             1,
                           )}
                           °C
                         </p>
-                        <p className="text-sm text-muted-foreground">Avg Temperature</p>
+                        <p className="text-sm text-cyan-100">Avg Temperature</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="glass bg-card/60 border-border/50 hover:bg-card/70 transition-all duration-300 group">
+                <Card className="backdrop-blur-xl bg-slate-800/70 border-white/20 hover:bg-slate-800/80 card-hover-lift transition-all duration-300 group shadow-lg">
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-blue-500/10 rounded-lg group-hover:bg-blue-500/20 transition-colors">
-                        <Droplets className="h-6 w-6 text-blue-500" />
+                      <div className="p-2.5 bg-blue-400/25 rounded-lg group-hover:bg-blue-400/35 transition-colors backdrop-blur-sm">
+                        <Droplets className="h-6 w-6 text-blue-200" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-foreground">
+                        <p className="text-2xl font-bold text-white drop-shadow-md">
                           {(filteredFloats.reduce((sum, f) => sum + f.salinity, 0) / filteredFloats.length).toFixed(1)}
                         </p>
-                        <p className="text-sm text-muted-foreground">Avg Salinity (PSU)</p>
+                        <p className="text-sm text-cyan-100">Avg Salinity (PSU)</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="glass bg-card/60 border-border/50 hover:bg-card/70 transition-all duration-300 group">
+                <Card className="backdrop-blur-xl bg-slate-800/70 border-white/20 hover:bg-slate-800/80 card-hover-lift transition-all duration-300 group shadow-lg">
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-purple-500/10 rounded-lg group-hover:bg-purple-500/20 transition-colors">
-                        <Gauge className="h-6 w-6 text-purple-500" />
+                      <div className="p-2.5 bg-purple-400/25 rounded-lg group-hover:bg-purple-400/35 transition-colors backdrop-blur-sm">
+                        <Gauge className="h-6 w-6 text-purple-200" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-foreground">
+                        <p className="text-2xl font-bold text-white drop-shadow-md">
                           {filteredFloats.reduce((sum, f) => sum + f.measurements, 0).toLocaleString()}
                         </p>
-                        <p className="text-sm text-muted-foreground">Total Measurements</p>
+                        <p className="text-sm text-cyan-100">Total Measurements</p>
                       </div>
                     </div>
                   </CardContent>
@@ -501,24 +474,28 @@ export default function DashboardPage() {
             {/* Charts Section */}
             <div className="grid lg:grid-cols-2 gap-6">
               {/* Depth-Time Profile */}
-              <Card className="glass bg-card/60 border-border/50">
-                <CardHeader>
-                  <CardTitle>Depth-Time Profile</CardTitle>
-                  <CardDescription>Temperature and salinity variations with depth over time</CardDescription>
+              <Card className="backdrop-blur-xl bg-white/20 border-white/30 shadow-2xl">
+                <CardHeader className="bg-gradient-to-r from-white/15 to-cyan-400/15 border-b border-white/20 pb-4">
+                  <CardTitle className="text-white drop-shadow-md font-semibold">Depth-Time Profile</CardTitle>
+                  <CardDescription className="text-cyan-100 mt-1">Temperature and salinity variations with depth over time</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <DepthChart selectedFloat={selectedFloat} />
+                <CardContent className="p-4">
+                  <div className="white-chart-container h-full p-4">
+                    <DepthChart selectedFloat={selectedFloat} />
+                  </div>
                 </CardContent>
               </Card>
 
               {/* Parameter Comparison */}
-              <Card className="glass bg-card/60 border-border/50">
-                <CardHeader>
-                  <CardTitle>Parameter Comparison</CardTitle>
-                  <CardDescription>Comparative analysis of oceanographic parameters</CardDescription>
+              <Card className="backdrop-blur-xl bg-white/20 border-white/30 shadow-2xl">
+                <CardHeader className="bg-gradient-to-r from-white/15 to-cyan-400/15 border-b border-white/20 pb-4">
+                  <CardTitle className="text-white drop-shadow-md font-semibold">Parameter Comparison</CardTitle>
+                  <CardDescription className="text-cyan-100 mt-1">Comparative analysis of oceanographic parameters</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <ParameterChart floats={filteredFloats} parameter={filters.parameter} />
+                <CardContent className="p-4">
+                  <div className="white-chart-container h-full p-4">
+                    <ParameterChart floats={filteredFloats} parameter={filters.parameter} />
+                  </div>
                 </CardContent>
               </Card>
             </div>
