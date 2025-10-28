@@ -4,11 +4,13 @@ import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowRight, BarChart3, Bot, Map, Search, Users } from "lucide-react"
+import { ArrowRight, BarChart3, Bot, Map, Search, Users, Volume2, VolumeX } from "lucide-react"
 
 export default function HomePage() {
   const [scrollY, setScrollY] = useState(0)
+  const [isMuted, setIsMuted] = useState(true)
   const heroRef = useRef<HTMLDivElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     let ticking = false
@@ -31,20 +33,43 @@ export default function HomePage() {
   const surfaceOffset = scrollY * 0.2
   const deepOffset = scrollY * 0.4
 
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted
+      setIsMuted(!isMuted)
+    }
+  }
+
   return (
     <div className="min-h-screen overflow-x-hidden">
       {/* Background video (full-bleed) with dark overlay for legibility */}
       <div className="fixed inset-0 z-0">
         <video
+          ref={videoRef}
           className="absolute inset-0 w-full h-full object-cover"
-          src="/floatchat-video.mp4"
+          src="/floatchat-video2.mp4"
           autoPlay
           loop
+          muted
           playsInline
+          preload="auto"
           aria-hidden="true"
-          style={{ transform: "scale(1.05)", transformOrigin: "center" }}
+          style={{ transform: "scale(1)", transformOrigin: "center" }}
         />
       </div>
+
+      {/* Mute/Unmute Button - Outside video container for proper z-index */}
+      <button
+        onClick={toggleMute}
+        className="fixed bottom-80 right-8 z-50 p-4 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full border border-white/20 transition-all duration-300 hover:scale-110 group cursor-pointer"
+        aria-label={isMuted ? "Unmute video" : "Mute video"}
+      >
+        {isMuted ? (
+          <VolumeX className="h-8 w-8 text-white drop-shadow-lg" />
+        ) : (
+          <Volume2 className="h-8 w-8 text-white drop-shadow-lg" />
+        )}
+      </button>
 
       {/* Hero Section */}
       <section ref={heroRef} className="relative min-h-screen flex items-center justify-center z-20 pt-20">
@@ -87,25 +112,6 @@ export default function HomePage() {
 
       {/* Features Section */}
       <section className="relative pt-32 pb-20 px-4 z-20 bg-slate-900">
-        {/* Animated wave overlay - creates seamless transition from video */}
-        <div className="absolute -top-20 left-0 right-0 h-32 overflow-hidden">
-          <svg
-            className="absolute top-0 w-[120%] h-32 text-slate-900 animate-wave-horizontal"
-            viewBox="0 0 1440 120"
-            preserveAspectRatio="none"
-            style={{ left: '-10%' }}
-          >
-            <path d="M0,60 C360,120 1080,0 1440,60 L1440,120 L0,120 Z" fill="currentColor" />
-          </svg>
-          <svg
-            className="absolute top-4 w-[120%] h-28 text-slate-900 opacity-70 animate-wave-horizontal-reverse"
-            viewBox="0 0 1440 120"
-            preserveAspectRatio="none"
-            style={{ left: '-10%' }}
-          >
-            <path d="M0,80 C480,20 960,100 1440,70 L1440,120 L0,120 Z" fill="currentColor" />
-          </svg>
-        </div>
         
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
